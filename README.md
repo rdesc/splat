@@ -273,12 +273,15 @@ This assumes you have [installed the interactive viewer](https://github.com/grap
 ```
 
 ## Next Steps and Future Work
-
-- features in colmap that we can try next (camera poses with the duckiebot)
-set a prior for the gaussian splat for the ground plane
-- geo-registration of the duckietown track
-- do masking for features in colmap
-
+To conclude this report, we highlight several key way in which this work may be extended in the future and the most immediate next steps.
+1. Experiment with several useful-looking features provided by COLMAP:
+   1. [Geo-registration](https://colmap.github.io/faq.html#geo-registration): Specify a world coordinate system for the Duckietown track and get the positions of at least 3 ground control points, where the position corresponds to the camera center of a collected image. This will allow for the 3D reconstruction to be geo-registered.
+   2. [Mask image regions](https://colmap.github.io/faq.html#mask-image-regions): Mask out regions of the image that should not be considered during feature extraction. This may be useful for ignoring features along the visually similar lane markings.
+   3. [Reconstruct from known camera poses](https://colmap.github.io/faq.html#reconstruct-sparse-dense-model-from-known-camera-poses): One idea is to use an additional sensor like wheel encoders to provide an initial guess for the camera poses, from which COLMAP performs a refinement step during reconstruction.
+2. Set a prior for the gaussian splats that represent the ground plane. This will help to ensure that the ground plane is flat in the reconstruction.
+3. Do clustering of the splats to identify the different objects in the scene and to extract these as unity assets.
+4. Integrate DuckieSplat with the Duckiematrix simulator.
+5. Run comparisons between the Duckiematrix and DuckieSplat simulators to quantify the sim-to-real gap.
 
 ## References
 
