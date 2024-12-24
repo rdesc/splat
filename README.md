@@ -52,7 +52,7 @@ Once training is complete, we can interact with DuckieSplat in a web browser: ht
 
 ```math
 t_{\alpha} = (1 - \alpha) t_1 + \alpha t_2, \\
-q_{\alpha} = (q_1 q_0^{-1})^{\alpha}q_0, \alpha \in \[0, 1\].
+q_{\alpha} = (q_1 q_0^{-1})^{\alpha}q_0, \alpha \in [0, 1].
 ```
 
 In the next section, we walk through the results of DuckieSplat using the different sensors and image collection protocols, while describing the technical issues we faced in producing a high-quality reconstruction of the Duckietown track.
