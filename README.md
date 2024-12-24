@@ -72,7 +72,7 @@ what else to show here?
 ## How to Reproduce
 
 ### Setup and Installation[^1]
-1. [Install CUDA 11.8 Compiler](#Installing-CUDA-11.8-Compiler)
+1. [Install CUDA 11.8 Compiler](#installing-cuda-118-compiler)
 1. [Install COLMAP](#Installing-COLMAP)
 2. [Install 3DGS](#Installing-3DGS)
 
@@ -164,7 +164,7 @@ Repeat the two steps above as required and for each of the image collection prot
 Once we have collected all the data, there are few optional post-processing steps including removing blurry or duplicate images and undistorting the Duckiebot images.
 
 Use the script [make_dataset.py](make_dataset.py) to help with making the dataset. This script will create the directory structure expected by 3DGS and will also optionally undistort the images.
-```shell
+```
 usage: make_dataset.py [-h] --save_dir SAVE_DIR [--ego_view EGO_VIEW [EGO_VIEW ...]] [--ego_keep_every EGO_KEEP_EVERY] [--overhead_view OVERHEAD_VIEW [OVERHEAD_VIEW ...]]
                        [--overhead_keep_every OVERHEAD_KEEP_EVERY] [--rectify] [--camera_intrinsic CAMERA_INTRINSIC]
 
@@ -224,7 +224,7 @@ E.g. with our demo dataset:
 python train.py -s duckiesplat_demo_data -m output/duckiesplat_demo --iterations 50000
 ```
 
-## Visualizing DuckieSplat
+## Visualizing 3DGS
 There are two ways to easily visualize the trained 3DGS. 
 
 ### WebGL 3D Gaussian Splat Viewer
@@ -268,4 +268,4 @@ set a prior for the gaussian splat for the ground plane
 [9] Z. Wang, A. C. Bovik, H. R. Sheikh, and E. P. Simoncelli, “Image quality assessment: From error visibility to structural similarity,” IEEE transactions on image processing, vol. 13, no. 4, pp. 600–612, 2004.
 
 
-[^1]: These instructions assumes a machine running Ubuntu 22
+[^1]: The instructions assume a machine running Ubuntu 22
