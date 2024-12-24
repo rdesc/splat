@@ -1,5 +1,7 @@
 # DuckieSplat: A Data-Driven Simulator for Duckietown
 
+Interactive DuckieSplat Demo: https://rdesc.dev/duckietown-project/index.html
+
 ## Introduction 
 
 Autonomous vehicles (AVs) are revolutionizing modern transportation, with Level 4 [1] self-driving vehicles becoming an increasingly regular presence on US roads. Despite this progress, ensuring the operational safety of AVs in safety-critical scenarios, such as adverse weather conditions or unexpected agent behaviours, remains a significant obstacle to the scalable adoption of self-driving technology. Simulation has emerged as a promising tool to improve coverage over the interesting, safety-critical distribution of driving scenarios, which can be used either for the training or evaluation of autonomous vehicles. 
@@ -40,6 +42,10 @@ At the core of 3DGS is a *real-time* differentiable rasterization process, which
 
 **DuckieSplat**: In this project, we utilize the official 3DGS repository to train a Gaussian Splat that can reconstruct the physical Duckietown track in the lab. We call the trained Gaussian Splat **DuckieSplat**. We first require a set of images of the track that can be used to train DuckieSplat. We experiment with images collected from two types of sensors: the Duckiebot camera and an iPhone camera. For each sensor, we also experiment with two image collection protocols. The first protocol involves manually collecting images with a Duckiebot (or iPhone that is approximately positioned at the height of a Duckiebot) as it completes one loop of the track. The second protocol involves collecting images from an overhead view, where we manually hold the Duckiebot (or iPhone camera) roughly 1.5m above the track and collect images at fixed intervals while walking once around the outside of the track. Figure 3 shows an example of a collected image following the first protocol (Figure 3, Left) and second protocol (Figure 3, Right). 
 
+| ![Figure 3](fig3.png) |
+|:--:|
+| Figure 3: **Image collection protocols.** *Left*: Duckiebot view. *Right*: Overhead view.|
+
 Given a set of images collected using one of the two sensors and one (or both) of the image collection protocols, we first run COLMAP to attain approximate camera extrinsic and intrinsic parameters as well as a sparse point cloud of the approximate 3D geometry. We then train DuckieSplat using the official repository with default settings. Depending on the set of images used for training, COLMAP takes between 1-2 hours to run and 3DGS training takes approximately 30 minutes.
 
 Once training is complete, we can interact with DuckieSplat in a web browser: https://rdesc.dev/duckietown-project/index.html. By default, DuckieSplat will render camera views from an (approximate) Duckiebot view as it drives along the centerline around the track in an infinite loop. Pressing the keyboard will break the infinite loop and allow a user to manually interact with DuckieSplat using keyboard control. We created the infinite loop by manually collecting a sequence of camera views (defined by a rotation matrix $R$ and translation vector $t$) while manually "driving" along the track inside DuckieSplat using keyboard control. We then interpolate the views using a simple linear interpolation scheme, where we use linear interpolation of the translation vectors and slerp interpolation of the rotations parameterized as quaternions:
@@ -52,8 +58,6 @@ q_{\alpha} = (q_1 q_0^{-1})^{\alpha}q_0
 In the next section, we walk through the results of DuckieSplat using the different sensors and image collection protocols, while describing the technical issues we faced in producing a high-quality reconstruction of the Duckietown track.
 
 ## Results
-
-Duckietown project demo https://rdesc.dev/duckietown-project/index.html
 
 ## References
 
