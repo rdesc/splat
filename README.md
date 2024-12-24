@@ -81,21 +81,25 @@ Feature matching is essential for COLMAP to find correspondences between images.
 | Figure 5: **Feature matching example in COLMAP.** *Left*: Duckiebot view. *Right*: Overhead view. |
 
 
+### Failure Cases
 ### Duckiebot Camera with Only Overhead View Images
 While this setup was able to generate a reasonable reconstruction of the Duckietown track, the quality of the reconstruction is insufficient when observing from the Duckiebot view. This is illustrated in the video below.
 
 https://github.com/user-attachments/assets/4924b53f-308d-4707-91a7-9cca2fc82202
 
-### Failure Cases
+### Duckiebot Camera with Both Duckiebot and Overhead View Images
 We were unable to successfully generate the sparse point cloud and camera poses using COLMAP with data collected with the Duckiebot camera with both Duckiebot view and overhead view images. 
-Although we tried several different settings including changing the camera resolution, exposure, adding more visually distinct features to the environment, increasing the lighting, and moving the duckiebot by hand to minimize motion blur, we were unable to generate a sparse point cloud with more than 2 images.
+Although we tried several different settings including changing the camera resolution, exposure, adding more visually distinct features to the environment, increasing the lighting, and moving the Duckiebot by hand to minimize motion blur, we were unable to generate a sparse point cloud with more than 2 images. We have several hypotheses for why this may have occurred, including the lack of visually distinct features in the environment particularly from the duckiebot view, and the motion blur caused by the Duckiebot's motion.
 
-We highlight several snapshot images and videos to illustrate such failure cases. In Figure 4 we visualize the poor reconstruction output from COLMAP.
+We highlight several snapshot to illustrate this failure case. In Figure 5 we visualize the poor reconstruction output from COLMAP. The large number of visually similar features in the Duckiebot view images (e.g., the yellow and white lane markings in Figure 6) likely contributed to the failure of COLMAP. 
 
 |                                              ![Figure 5](figures/colmap_failure1.png)                                              |
 |:----------------------------------------------------------------------------------------------------------------------------------:|
 | Figure 5: **Example of poor reconstruction** *Left*: Camera pose information. *Right*: Output from the Multi-View Stereo pipeline. |
 
+|                                         ![Figure 6](figures/colmap_vis_features2.png)                                          |
+|:------------------------------------------------------------------------------------------------------------------------------:|
+| Figure 6: **Example of feature matching**. The red points are the detected features while the green lines are feature matches. |
 
 
 ## How to Reproduce
@@ -273,7 +277,7 @@ This assumes you have [installed the interactive viewer](https://github.com/grap
 - features in colmap that we can try next (camera poses with the duckiebot)
 set a prior for the gaussian splat for the ground plane
 - geo-registration of the duckietown track
-- 
+- do masking for features in colmap
 
 
 ## References
