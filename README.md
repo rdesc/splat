@@ -273,7 +273,7 @@ This assumes you have [installed the interactive viewer](https://github.com/grap
 ```
 
 ## Next Steps and Future Work
-To conclude this report, we highlight several key way in which this work may be extended in the future and the most immediate next steps.
+To conclude this report, we highlight several key ways in which this work may be extended in the future and the most immediate next steps.
 1. Experiment with several useful-looking features provided by COLMAP:
    1. [Geo-registration](https://colmap.github.io/faq.html#geo-registration): Specify a world coordinate system for the Duckietown track and get the positions of at least 3 ground control points, where the position corresponds to the camera center of a collected image. This will allow for the 3D reconstruction to be geo-registered.
    2. [Mask image regions](https://colmap.github.io/faq.html#mask-image-regions): Mask out regions of the image that should not be considered during feature extraction. This may be useful for ignoring features along the visually similar lane markings.
