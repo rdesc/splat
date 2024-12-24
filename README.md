@@ -1,6 +1,6 @@
 # DuckieSplat: A Data-Driven Simulator for Duckietown
 
-Interactive DuckieSplat Demo: https://rdesc.dev/duckietown-project/index.html
+Interactive DuckieSplat Demo: https://rdesc.dev/duckiesplat
 
 ## Introduction 
 
