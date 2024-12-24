@@ -2,6 +2,8 @@
 
 Interactive DuckieSplat Demo: https://rdesc.dev/duckiesplat
 
+**Contributors**: Rodrigue de Schaetzen, Luke Rowe, and Shiyao Ni
+
 ## Introduction 
 
 Autonomous vehicles (AVs) are revolutionizing modern transportation, with Level 4 [1] self-driving vehicles becoming an increasingly regular presence on US roads. Despite this progress, ensuring the operational safety of AVs in safety-critical scenarios, such as adverse weather conditions or unexpected agent behaviours, remains a significant obstacle to the scalable adoption of self-driving technology. Simulation has emerged as a promising tool to improve coverage over the interesting, safety-critical distribution of driving scenarios, which can be used either for the training or evaluation of autonomous vehicles. 
