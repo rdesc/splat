@@ -8,7 +8,7 @@ Autonomous vehicles (AVs) are revolutionizing modern transportation, with Level 
 
 The supported simulator for Duckietown is the Duckiematrix, which is created in Unity and relies on handcrafted assets to construct virtual environments for testing Duckiebots. This approach to simulation is similar to traditional driving simulators such as CARLA [2], which are handcrafted and thus rely on costly manual labour to create simulation environments. Consequently, these handcrafted environments are difficult to scale to novel environments and suffer from a significant sim-to-real gap. We illustrate the sim-to-real *appearance* gap in Figure 1. To address these limitations of handcrafted simulators, recent works have instead focused on *data-driven* simulation, whereby collected real-world driving data can be leveraged to derive simulation environments, either by training a generative model to sample from the distribution of such data [3], or by employing novel view synthesis techniques to reconstruct 3D environments of the data [4-5]. 
 
-| ![Figure 1](fig1.png) |
+| ![Figure 1](figures/fig1.png) |
 |:--:|
 | Figure 1: **Data-driven simulators exhibit smaller visual sim-to-real gap than handcrafted simulators.** *Left*: Real image of Duckietown track in the lab. *Middle*: Rendered image of simulated Duckietown track in the Duckiematrix. *Right*: Rendered image of simulated Duckietown track in DuckieSplat. |
 
@@ -26,7 +26,7 @@ This section outlines the 3D Gaussian Splatting algorithm, which leverages data 
 ```
 which guarantees that $\Sigma$ remains positive semi-definite. The scale parameters are optimized independently along each of the $x$, $y$, and $z$ dimensions, producing an *anisotropic* covariance matrix. This anisotropic parameterization offers greater flexibility in fitting 3D geometries compared to an isotropic covariance matrix. 
 
-| ![Figure 2](fig2.png) |
+| ![Figure 2](figures/fig2.png) |
 |:--:|
 | Figure 2: **Gaussian Splatting Pipeline.** Gaussian Splatting starts from a sparse point cloud derived from COLMAP, which are used to initialize a set of 3D Gaussians. Given a camera view, the Gaussians are projected into 2D and rasterized efficiently with a differentiable tile rasterizer. The rendering process is fully differentiable, which enables updating the Gaussian parameters with gradient-based optimization.|
 
@@ -42,7 +42,7 @@ At the core of 3DGS is a *real-time* differentiable rasterization process, which
 
 **DuckieSplat**: In this project, we utilize the official 3DGS repository to train a Gaussian Splat that can reconstruct the physical Duckietown track in the lab. We call the trained Gaussian Splat **DuckieSplat**. We first require a set of images of the track that can be used to train DuckieSplat. We experiment with images collected from two types of sensors: the Duckiebot camera and an iPhone camera. For each sensor, we also experiment with two image collection protocols. The first protocol involves manually collecting images with a Duckiebot (or iPhone that is approximately positioned at the height of a Duckiebot) as it completes one loop of the track. The second protocol involves collecting images from an overhead view, where we manually hold the Duckiebot (or iPhone camera) roughly 1.5m above the track and collect images at fixed intervals while walking once around the outside of the track. Figure 3 shows an example of a collected image following the first protocol (Figure 3, Left) and second protocol (Figure 3, Right). 
 
-| ![Figure 3](fig3.png) |
+| ![Figure 3](figures/fig3.png) |
 |:--:|
 | Figure 3: **Image collection protocols.** *Left*: Duckiebot view. *Right*: Overhead view.|
 
@@ -58,6 +58,194 @@ q_{\alpha} = (q_1 q_0^{-1})^{\alpha}q_0, \alpha \in [0, 1].
 In the next section, we walk through the results of DuckieSplat using the different sensors and image collection protocols, while describing the technical issues we faced in producing a high-quality reconstruction of the Duckietown track.
 
 ## Results
+
+talk about issues with runninng colmap with duckiebot
+
+show snapshots of the issues with colmap
+
+training loss curves 
+
+show the duckiesplat in action
+
+what else to show here?
+
+## How to Reproduce
+
+### Setup and Installation[^1]
+1. [Install CUDA 11.8 Compiler](#Installing-CUDA-11.8-Compiler)
+1. [Install COLMAP](#Installing-COLMAP)
+2. [Install 3DGS](#Installing-3DGS)
+
+### Generating a DuckieSplat
+1. [Collect Data](#Collecting-data)
+2. [Generate Dataset](#Generating-a-dataset)
+2. [Run COLMAP](#Running-COLMAP)
+3. [Train 3DGS](#Training-3DGS)
+3. [Visualize 3DGS](#Visualizing-3DGS)
+
+### Installing CUDA 11.8 Compiler
+Check to see your current CUDA compiler version:
+```shell    
+nvcc --version
+```
+The 3DGS repo requires a specific version of the CUDA compiler. See the instructions for installing [CUDA compiler 11.8](https://developer.nvidia.com/cuda-11-8-0-download-archive?target_os=Linux&target_arch=x86_64&Distribution=Ubuntu&target_version=22.04&target_type=runfile_local).
+
+Install the cuda-toolkit-gcc package:
+```shell
+sudo apt-get install nvidia-cuda-toolkit-gcc
+```
+
+### Installing COLMAP
+Instructions to install COLMAP are found on the [documentation webpage](https://colmap.github.io/install.html#debian-ubuntu). Run the cmake command with the following flags:
+```shell
+cmake .. -GNinja -DCMAKE_CUDA_COMPILER=/usr/local/cuda-11.8/bin/nvcc -DCMAKE_CUDA_ARCHITECTURES=75
+```
+### Installing 3DGS
+Instructions are found in the official github repository: https://github.com/graphdeco-inria/gaussian-splatting. 
+
+For easy reference here are the main steps for installing 3DGS:
+```shell
+git clone https://github.com/graphdeco-inria/gaussian-splatting --recursive
+conda env create --file environment.yml
+conda activate gaussian_splatting
+```
+
+(Optional): It is useful to install the [optional interactive viewer](https://github.com/graphdeco-inria/gaussian-splatting?tab=readme-ov-file#interactive-viewers) for viewing the 3DGS and [tensorboard](https://pypi.org/project/tensorboard/) for monitoring training progress.
+
+### Collecting Data
+Although we failed to get COLMAP working with data collected with the Duckiebot camera, we describe our process here nonetheless.
+We skip the details on how to collect data with the iPhone camera ;)
+
+#### Increase the resolution of the Duckiebot camera
+The default resolution of the Duckiebot camera is 640x480 pixels. This resolution is too low to capture sufficient image features for COLMAP to work effectively. We can increase the resolution of the Duckiebot camera by changing the camera settings on the Duckiebot. More details on the Duckiebot camera specs are found [here](https://www.waveshare.com/wiki/IMX219-160_Camera).
+
+Edit the file `/data/config/node/camera_driver_front_center/$DUCKIEBOT_NAME.yaml` on the Duckiebot. There are three parameters of interest: res_h, res_w, and exposure. Set res_h and res_w to 1080 and 1920, respectively, and set exposure to 13000. The updated file should look like this:
+```yaml
+allow_partial_fov: false
+exposure: 13000
+exposure_mode: sports
+fov: 160
+framerate: 30
+maker: Seeed Technology Co., Ltd
+model: IMX219
+res_h: 1080
+res_w: 1920
+rotation: 0
+use_hw_acceleration: true
+```
+**NOTE**: Changing the camera settings requires camera calibration for the new camera intrinsics!
+
+Next, restart the camera-related docker containers:
+```shell
+docker -H donald.local restart ros1-camera driver-camera
+```
+The duckiebot camera should now be set to 1080x1920 resolution.
+
+#### Collecting images with the Duckiebot camera
+Exec into one of the ros containers on the duckiebot:
+```shell
+docker -H $DUCKIEBOT_NAME.local exec -it $ROS_CONTAINER_ID bash
+```
+Now, run the image saver node which saves images from the camera to the `/duckiebot_images` directory:
+```shell
+rosrun image_view image_saver image:=/$DUCKIEBOT_NAME/camera_node/image _image_transport:=compressed _filename_format:="/duckiebot_images/frame%04d.png"
+```
+You can now drive the Duckiebot, either manually by hand, using teleoperation, or with one of the lane following scripts. We found that the best way to minimize motion blur is to move the Duckiebot by hand. To stop the image saver node, press `Ctrl+C`.
+
+#### Copying images from the Duckiebot to your local machine
+```shell
+docker -H $DUCKIEBOT_NAME.local cp $ROS_CONTAINER_ID:/duckiebot_images .
+```
+
+#### Repeat steps for the overhead images
+Repeat the two steps above as required and for each of the image collection protocols: Duckiebot view and Overhead view.
+
+## Generating a Dataset
+Once we have collected all the data, there are few optional post-processing steps including removing blurry or duplicate images and undistorting the Duckiebot images.
+
+Use the script [make_dataset.py](make_dataset.py) to help with making the dataset. This script will create the directory structure expected by 3DGS and will also optionally undistort the images.
+```shell
+usage: make_dataset.py [-h] --save_dir SAVE_DIR [--ego_view EGO_VIEW [EGO_VIEW ...]] [--ego_keep_every EGO_KEEP_EVERY] [--overhead_view OVERHEAD_VIEW [OVERHEAD_VIEW ...]]
+                       [--overhead_keep_every OVERHEAD_KEEP_EVERY] [--rectify] [--camera_intrinsic CAMERA_INTRINSIC]
+
+Copy and optionally rectify selected images.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --save_dir SAVE_DIR   Target directory to save the selected images.
+  --ego_view EGO_VIEW [EGO_VIEW ...]
+                        List of directories for ego view images.
+  --ego_keep_every EGO_KEEP_EVERY
+                        Interval to keep every nth ego view frame.
+  --overhead_view OVERHEAD_VIEW [OVERHEAD_VIEW ...]
+                        List of directories for overhead view images.
+  --overhead_keep_every OVERHEAD_KEEP_EVERY
+                        Interval to keep every nth overhead view frame.
+  --rectify             Enable rectification of images.
+  --camera_intrinsic CAMERA_INTRINSIC
+                        Path to the camera intrinsic YAML file.
+```
+
+The directory structure should look like this:
+````
+dataset_name/
+    |---input/
+        |---0000.png
+        |---0001.png
+        |---...
+````
+
+### Downloading the dataset from the DuckieSplat demo
+The dataset used to generate our DuckieSplat demo can be downloaded [here](https://drive.google.com/file/d/1bJj43FXBGewSxS9gn500TFwBqkRJVsaD/view?usp=sharing). Or with via the following command
+```shell
+gdown https://drive.google.com/uc\?id\=1bJj43FXBGewSxS9gn500TFwBqkRJVsaD
+unzip duckiesplat_demo_data.zip
+```
+
+The dataset contains the raw images inside **duckiesplat_demo_data/input**, as well as the outputs from running COLMAP.
+
+## Running COLMAP
+With the properly formatted dataset, we can now run COLMAP to estimate the camera poses and sparse point cloud. From the root directory of the cloned 3DGS repository, run the following command:
+
+```shell
+python convert.py --source_path $PATH_TO_DATASET
+```
+
+If the script ends with outputting a message saying only 2 images were successfully reconstructed, then something went wrong. This typically means that the dataset lacks sufficient unique features for COLMAP to work effectively. 
+
+## Training 3DGS
+From the root directory of the cloned 3DGS repository, run the following command:
+
+```shell
+python train.py -s $PATH_TO_DATASET -m $PATH_TO_OUTPUT_DIR --iterations 50000
+````
+E.g. with our demo dataset:
+```shell
+python train.py -s duckiesplat_demo_data -m output/duckiesplat_demo --iterations 50000
+```
+
+## Visualizing DuckieSplat
+There are two ways to easily visualize the trained 3DGS. 
+
+### WebGL 3D Gaussian Splat Viewer
+Find the `point_cloud.ply` file in the output directory and drag and drop the file into the browser at https://rdesc.dev/duckiesplat/.
+This will automatically convert the `.ply` file to a `.splat` file for easier rendering in the browser.
+
+This makes use of the project https://github.com/antimatter15/splat/.
+
+### Interactive Viewer 
+This assumes you have [installed the interactive viewer](https://github.com/graphdeco-inria/gaussian-splatting?tab=readme-ov-file#interactive-viewers):
+```shell
+./SIBR_viewers/install/bin/SIBR_gaussianViewer_app --m $PATH_TO_OUTPUT_DIR
+```
+
+## Next Steps and Future Work
+
+- features in colmap that we can try next (camera poses with the duckiebot)
+set a prior for the gaussian splat for the ground plane
+- geo-registration of the duckietown track
+- 
+
 
 ## References
 
@@ -80,3 +268,4 @@ In the next section, we walk through the results of DuckieSplat using the differ
 [9] Z. Wang, A. C. Bovik, H. R. Sheikh, and E. P. Simoncelli, “Image quality assessment: From error visibility to structural similarity,” IEEE transactions on image processing, vol. 13, no. 4, pp. 600–612, 2004.
 
 
+[^1]: These instructions assumes a machine running Ubuntu 22
